@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KDG Metadata Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6981152180026116"
+     crossorigin="anonymous"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap');
+      
+      :root {
+        --color-background: #0A0F1A;
+        --color-panel: #141A28;
+        --color-panel-light: #1E2538;
+        --color-panel-border: #00E5FF;
+        --color-text-primary: #E0E6F0;
+        --color-text-secondary: #88A0B8;
+        --color-accent-primary: #FFD700; /* Gold */
+        --color-accent-primary-hover: #FFEE80;
+        --color-accent-secondary: #D92E2E; /* Red */
+        --color-accent-secondary-hover: #F84D4D;
+        --color-success: #33FFB5;
+        --color-fail: #FF5555;
+      }
+      
+      body {
+        font-family: 'Orbitron', sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--color-background);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--color-panel-light);
+        border-radius: 2px;
+        border: 3px solid var(--color-background);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-panel-border);
+      }
+      
+      #background-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(ellipse at center, rgba(10, 15, 26, 0) 0%, var(--color-background) 70%),
+                    linear-gradient(to bottom, rgba(0, 229, 255, 0.05), transparent 30%);
+        overflow: hidden;
+      }
+      #background-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(var(--color-panel-border), transparent 1px),
+            linear-gradient(to right, var(--color-panel-border), transparent 1px);
+        background-size: 50px 50px;
+        opacity: 0.03;
+        animation: pan 60s linear infinite;
+      }
+      #background-overlay::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z" fill="none" stroke="%2300E5FF" stroke-width="0.2"/></svg>');
+        background-size: 75px;
+        opacity: 0.04;
+        animation: pan 90s linear infinite reverse;
+      }
+      
+      @keyframes pan {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(-50px, -50px); }
+      }
+      
+      .panel-hud {
+        position: relative;
+        border: 1px solid var(--color-panel-light);
+        background-color: var(--color-panel);
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.05), inset 0 0 15px rgba(0, 0, 0, 0.3);
+      }
+      .panel-hud::before, .panel-hud::after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border-color: var(--color-panel-border);
+        border-style: solid;
+        transition: all 0.3s ease;
+      }
+      .panel-hud::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+      .panel-hud::after { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
+      
+      .panel-hud-footer::before, .panel-hud-footer::after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border-color: var(--color-panel-border);
+        border-style: solid;
+        transition: all 0.3s ease;
+      }
+      .panel-hud-footer::before { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
+      .panel-hud-footer::after { bottom: -2px; right: -2px; border-width: 0 0 2px 2px; }
+
+      .glow-text-primary { text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); }
+      .glow-text-secondary { text-shadow: 0 0 8px rgba(217, 46, 46, 0.7); }
+      .glow-text-cyan { text-shadow: 0 0 8px rgba(0, 229, 255, 0.7); }
+      
+      .input-hud {
+        background-color: var(--color-background);
+        border: 1px solid var(--color-panel-light);
+        border-radius: 2px;
+        color: var(--color-text-primary);
+        transition: all 0.2s ease-in-out;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+      }
+      .input-hud:focus {
+        outline: none;
+        border-color: var(--color-panel-border);
+        box-shadow: 0 0 10px rgba(0, 229, 255, 0.5), inset 0 1px 3px rgba(0,0,0,0.4);
+      }
+      
+      .progress-bar {
+          background-color: var(--color-panel-light);
+          border-radius: 2px;
+          overflow: hidden;
+          border: 1px solid var(--color-panel-border);
+          box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      }
+      .progress-bar-inner {
+          height: 100%;
+          background: linear-gradient(90deg, var(--color-panel-border) 0%, var(--color-accent-primary) 100%);
+          transition: width 0.3s ease-out;
+          box-shadow: 0 0 15px var(--color-panel-border);
+      }
+    </style>
+  <!-- Add Babel for JSX Transpilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "@google/genai": "https://esm.sh/@google/genai@0.14.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <div id="background-overlay"></div>
+    <div id="root"></div>
+    <script type="text/babel" data-type="module">
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { GoogleGenAI, Type } from "@google/genai";
+
+const { useState, useCallback, useEffect, useMemo, useRef, StrictMode, Fragment } = React;
+
+// --- from components/Icons.tsx ---
+const ArcReactorIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" {...props}>
+    <defs>
+      <radialGradient id="arcReactorGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" style={{ stopColor: '#FFF', stopOpacity: 1 }} />
+        <stop offset="60%" style={{ stopColor: 'var(--color-panel-border)', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: 'var(--color-panel-border)', stopOpacity: 0 }} />
+      </radialGradient>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+        <feMerge>
+          <feMergeNode in="coloredBlur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+    <g filter="url(#glow)">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-panel-border)" strokeWidth="4" opacity="0.5" />
+      <circle cx="50" cy="50" r="30" fill="url(#arcReactorGlow)" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="var(--color-panel-border)" strokeWidth="2" />
+      {[...Array(12)].map((_, i) => (
+        <line
+          key={i}
+          x1="50"
+          y1="50"
+          x2={50 + 45 * Math.cos(i * 30 * Math.PI / 180)}
+          y2={50 + 45 * Math.sin(i * 30 * Math.PI / 180)}
+          stroke="var(--color-panel-border)"
+          strokeWidth="2"
+          opacity="0.7"
+        />
+      ))}
+      <circle cx="50" cy="50" r="20" fill={props.isProcessing ? 'var(--color-accent-primary)' : 'var(--color-panel)'} stroke="var(--color-panel-border)" strokeWidth="3" style={{ transition: 'fill 0.3s ease' }} />
+    </g>
+  </svg>
+);
+const UploadCloudIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/>
+  </svg>
+);
+const LoadingSpinnerIcon = (props) => (
+  <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
+const CheckCircleIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+const XCircleIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+  </svg>
+);
+const DownloadIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+);
+const SparklesIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M12 2L9.88 7.12L4.06 7.94L8.03 12.06L7.17 17.88L12 15.09L16.83 17.88L15.97 12.06L19.94 7.94L14.12 7.12L12 2Z"/>
+        <path d="M4.93 4.93L6.34 6.34"/>
+        <path d="M17.66 17.66L19.07 19.07"/>
+        <path d="M2 12H4"/>
+        <path d="M20 12H22"/>
+        <path d="M6.34 17.66L4.93 19.07"/>
+        <path d="M19.07 4.93L17.66 6.34"/>
+    </svg>
+);
+const TrashIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+const RefreshCwIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M21 2v6h-6"/>
+    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+    <path d="M3 22v-6h6"/>
+    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+  </svg>
+);
+const EyeIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+);
+const EyeOffIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>
+    </svg>
+);
+const PauseIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
+  </svg>
+);
+const StopIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+  </svg>
+);
+const PlayIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+);
+
+// --- from components/Button.tsx ---
+const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  isLoading = false,
+  className = '',
+  ...props
+}) => {
+  const baseStyles = "inline-flex items-center justify-center rounded-sm font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider shadow-md";
+  const sizeStyles = {
+    sm: 'px-3 py-1.5 text-xs',
+    md: 'px-5 py-2.5 text-sm',
+    lg: 'px-6 py-3 text-base',
+  };
+  const variantStyles = {
+    primary: 'bg-accent-primary text-background hover:bg-accent-primary-hover focus:ring-accent-primary shadow-[0_0_15px_rgba(255,215,0,0.4)]',
+    secondary: 'bg-panel-light text-text-primary hover:bg-[#3A3D44] focus:ring-panel-border',
+    danger: 'bg-accent-secondary text-text-primary hover:bg-accent-secondary-hover focus:ring-accent-secondary shadow-[0_0_15px_rgba(217,46,46,0.4)]',
+    outline: 'bg-transparent border border-panel-border text-panel-border hover:bg-panel-border hover:text-background focus:ring-panel-border'
+  };
+  return (
+    <button
+      type="button"
+      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      disabled={isLoading || props.disabled}
+      {...props}
+    >
+      {isLoading && (
+        <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      )}
+      {children}
+    </button>
+  );
+};
+
+// --- from components/AdsenseAd.tsx ---
+const AdsenseAd = ({
+  client,
+  slot,
+  style = { display: 'block' },
+  format = 'auto',
+  responsive = 'true',
+}) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.error('Adsense error:', e);
+      }
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+  if (client === 'ca-pub-XXXXXXXXXXXXXXXX' || slot === 'YYYYYYYYYY') {
+    return (
+        <div className="text-center p-4 bg-panel border-2 border-panel-light rounded-sm h-full flex flex-col justify-center panel-hud">
+            <p className="text-gray-400 font-semibold">ADVERTISEMENT SLOT</p>
+            <p className="text-xs text-gray-500">Replace placeholder in App.tsx to display ads</p>
+            <div className="panel-hud-footer"></div>
+        </div>
+    );
+  }
+  return (
+    <div className="bg-panel border border-panel-light rounded-sm shadow-lg h-full flex flex-col p-4 panel-hud w-full">
+        <div className="panel-hud-footer"></div>
+        <p className="text-xs text-center text-text-secondary mb-2 uppercase tracking-wider">Advertisement</p>
+       <ins
+          className="adsbygoogle"
+          style={{ display: 'block', width: '100%', minHeight: '90px', backgroundColor: 'var(--color-panel-light)' }}
+          data-ad-client={client}
+          data-ad-slot={slot}
+          data-ad-format={format}
+          data-full-width-responsive={responsive}
+        ></ins>
+    </div>
+  );
+};
+
+
+// --- from services/geminiService.ts ---
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result;
+      resolve(result.split(',')[1]);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
+const extractFramesFromVideo = (videoFile, frameCount = 4, quality = 0.7) => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return reject(new Error('Tidak dapat membuat konteks kanvas.'));
+    }
+    video.muted = true;
+    video.playsInline = true;
+    const videoUrl = URL.createObjectURL(videoFile);
+    video.src = videoUrl;
+    const captureFrame = (time) => {
+      return new Promise((resolveFrame) => {
+        const onSeeked = () => {
+          video.removeEventListener('seeked', onSeeked);
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolveFrame(dataUrl.split(',')[1]);
+          } else {
+            resolveFrame(null);
+          }
+        };
+        video.addEventListener('seeked', onSeeked, { once: true });
+        video.currentTime = time;
+      });
+    };
+    video.addEventListener('loadedmetadata', async () => {
+      if (video.duration > 0) {
+        const capturePromises = [];
+        for (let i = 0; i < frameCount; i++) {
+          const time = video.duration * (i + 1) / (frameCount + 1);
+          capturePromises.push(captureFrame(time));
+        }
+        try {
+          const frames = (await Promise.all(capturePromises)).filter(Boolean);
+          URL.revokeObjectURL(videoUrl);
+          resolve(frames);
+        } catch (err) {
+          URL.revokeObjectURL(videoUrl);
+          reject(err);
+        }
+      } else {
+        URL.revokeObjectURL(videoUrl);
+        resolve([]);
+      }
+    });
+    video.addEventListener('error', () => {
+      URL.revokeObjectURL(videoUrl);
+      reject(new Error(`Gagal memuat video: ${video.error?.message || 'Kesalahan tidak dikenal'}`));
+    });
+    video.load();
+  });
+};
+const parseJsonResponse = (text, maxTitleLength) => {
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed.description === 'string' && typeof parsed.keywords === 'string' && typeof parsed.categories === 'string') {
+        const description = parsed.description.length > maxTitleLength ? parsed.description.substring(0, maxTitleLength - 3) + '...' : parsed.description;
+        return { description, keywords: parsed.keywords, categories: parsed.categories };
+    }
+    throw new Error("Struktur JSON tidak valid untuk metadata. 'description', 'keywords', atau 'categories' tidak ditemukan.");
+  } catch (e) {
+    console.error("Gagal mem-parsing respons JSON dari AI:", e, "Teks asli:", text);
+    throw new Error(`Gagal memproses respons AI. Format tidak valid. Respons mentah: ${text.substring(0,100)}...`);
+  }
+};
+const generateMetadataForFile = async (file, apiKey, settings) => {
+  if (!apiKey) {
+    throw new Error("Kunci API Gemini tidak disediakan. Harap masukkan di aplikasi.");
+  }
+  const ai = new GoogleGenAI({ apiKey: apiKey });
+  const { maxTitleLength, maxKeywords } = settings;
+  const shutterstockCategories = [
+    "Abstract", "Animals/Wildlife", "The Arts", "Backgrounds/Textures", "Beauty/Fashion", 
+    "Buildings/Landmarks", "Business/Finance", "Celebrities", "Education", "Food and Drink", 
+    "Healthcare/Medical", "Holidays", "Industrial", "Interiors", "Miscellaneous", "Nature", 
+    "Objects", "Parks/Outdoor", "People", "Religion", "Science", "Signs/Symbols", 
+    "Sports/Recreation", "Technology", "Transportation", "Vintage"
+  ].join(', ');
+  let promptParts = [];
+  let systemInstruction = "You are an expert AI assistant specializing in creating metadata for media files for stock platforms like Shutterstock.";
+  const commonPromptInstruction = `
+Buat deskripsi yang ringkas dan menarik dalam bahasa Inggris (maksimal ${maxTitleLength} karakter), daftar kata kunci yang relevan dalam bahasa Inggris (minimal 25, maksimal ${maxKeywords} kata kunci, dipisahkan koma), dan pilih satu atau dua kategori yang relevan dari daftar yang disediakan.
+Kategori yang tersedia adalah: ${shutterstockCategories}.
+
+Hanya balas dengan objek JSON yang valid dengan tiga kunci: "description" (string dalam bahasa Inggris), "keywords" (string dalam bahasa Inggris, dipisahkan koma), dan "categories" (string yang berisi satu atau dua kategori dari daftar, dipisahkan koma jika memilih dua).
+Contoh: {"description": "A close-up of a vibrant red rose with morning dew drops on its petals, symbolizing love and beauty.", "keywords": "rose, red rose, flower, nature, beauty, love, romance, petal, dew drop, morning, fresh, vibrant, garden, flora, plant, blossom, beautiful, romantic, symbol, passion, gift, valentine, wedding, botany, close-up, macro, isolated, background, spring, summer, floral, decoration, natural, aroma, elegant, delicate, perfect", "categories": "Nature,Objects"}
+Pastikan deskripsi tidak melebihi ${maxTitleLength} karakter.`;
+  const responseSchema = {
+    type: Type.OBJECT,
+    properties: {
+      description: {
+        type: Type.STRING,
+        description: `A concise and compelling description in English (max ${maxTitleLength} characters).`
+      },
+      keywords: {
+        type: Type.STRING,
+        description: `A comma-separated list of relevant keywords in English (25-${maxKeywords} keywords).`
+      },
+      categories: {
+        type: Type.STRING,
+        description: "One or two relevant categories from the provided list, comma-separated."
+      }
+    },
+    required: ["description", "keywords", "categories"]
+  };
+  if (file.type.startsWith('image/')) {
+    try {
+      const base64Data = await fileToBase64(file);
+      promptParts.push({ inlineData: { mimeType: file.type, data: base64Data } });
+      promptParts.push({ text: `Analisis gambar ini. ${commonPromptInstruction}` });
+    } catch (error) {
+      console.error("Error converting image to base64:", error);
+      throw new Error("Gagal memproses gambar.");
+    }
+  } else if (file.type.startsWith('video/')) {
+    try {
+      const frames = await extractFramesFromVideo(file);
+      if (frames.length === 0) {
+        console.warn(`Tidak dapat mengekstrak bingkai dari ${file.name}, kembali ke analisis nama berkas.`);
+        promptParts.push({ text: `Berdasarkan nama file video "${file.name}". ${commonPromptInstruction}` });
+      } else {
+        frames.forEach(base64Data => {
+          promptParts.push({ inlineData: { mimeType: 'image/jpeg', data: base64Data } });
+        });
+        promptParts.push({ text: `Analisis bingkai-bingkai kunci dari video ini untuk memahami kontennya. ${commonPromptInstruction}` });
+      }
+    } catch (error) {
+      console.error("Gagal mengekstrak bingkai dari video, kembali ke nama berkas:", error);
+      promptParts.push({ text: `Berdasarkan nama file video "${file.name}". ${commonPromptInstruction}` });
+    }
+  } else {
+    promptParts.push({ text: `Berdasarkan nama file "${file.name}". ${commonPromptInstruction}` });
+  }
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash", 
+      contents: [{ parts: promptParts }],
+      config: {
+        systemInstruction: systemInstruction,
+        responseMimeType: "application/json", 
+        responseSchema: responseSchema,
+        temperature: 0.5, 
+      },
+    });
+    const textResponse = response.text;
+    if (!textResponse) {
+        throw new Error("Respons AI kosong.");
+    }
+    return parseJsonResponse(textResponse, maxTitleLength);
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    if (error instanceof Error && error.message.includes("400")) {
+        throw new Error("Permintaan ke AI tidak valid. Ini mungkin karena format file atau ukuran data.");
+    }
+    if (error instanceof Error && error.message.includes("API key not valid")) {
+        throw new Error("Kunci API Gemini tidak valid. Silakan periksa kunci yang Anda masukkan.");
+    }
+    throw new Error(`Gagal menghubungi layanan AI: ${error instanceof Error ? error.message : String(error)}`);
+  }
+};
+
+// --- from components/FileUploader.tsx ---
+const FileUploader = ({ onFilesAdded }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const handleFileChange = (event) => {
+    if (event.target.files) {
+      onFilesAdded(Array.from(event.target.files));
+    }
+    event.target.value = '';
+  };
+  const handleDragEnter = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(true);
+  }, []);
+  const handleDragLeave = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+  }, []);
+  const handleDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
+  const handleDrop = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      onFilesAdded(Array.from(event.dataTransfer.files));
+      event.dataTransfer.clearData();
+    }
+  }, [onFilesAdded]);
+  return (
+    <div
+      className={`relative p-8 border border-dashed rounded-sm transition-all duration-300 ease-in-out cursor-pointer
+                  bg-panel/50 backdrop-blur-sm
+                  ${isDragging ? 'border-solid border-accent-primary scale-105 shadow-[0_0_30px_0px_rgba(255,215,0,0.5)]' : 'border-panel-border/50 hover:border-accent-primary/80'}`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onClick={() => document.getElementById('fileInput')?.click()}
+    >
+      <input
+        type="file"
+        id="fileInput"
+        multiple
+        accept="image/*,video/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <div className="relative flex flex-col items-center justify-center space-y-4 text-text-secondary">
+        <UploadCloudIcon className={`w-16 h-16 transition-colors ${isDragging ? 'text-accent-primary' : 'text-text-secondary'}`} />
+        <p className="text-xl font-semibold text-text-primary uppercase tracking-wider">
+          DRAG & DROP FILES, OR <span className="text-accent-primary font-bold glow-text-primary">CLICK TO SELECT</span>
+        </p>
+        <p className="text-sm text-text-secondary">SUPPORTS ALL POPULAR IMAGE AND VIDEO FORMATS</p>
+      </div>
+    </div>
+  );
+};
+
+
+// --- from App.tsx ---
+const usePrevious = (value) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+const App = () => {
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [apiKey, setApiKey] = useState('');
+  const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+  const [maxTitleLength, setMaxTitleLength] = useState(200);
+  const [maxKeywords, setMaxKeywords] = useState(40);
+  const [batchSize, setBatchSize] = useState(5);
+  const [processingState, setProcessingState] = useState('idle'); // idle, running, paused
+  const [processedCount, setProcessedCount] = useState(0);
+  const [totalToProcess, setTotalToProcess] = useState(0);
+  const [report, setReport] = useState(null); // null or { successful: [], failed: [] }
+  const [logs, setLogs] = useState([]);
+
+  const filesToProcessRef = useRef([]);
+  const currentIndexRef = useRef(0);
+  const apiKeysRef = useRef([]);
+  const batchApiKeyIndexRef = useRef(0);
+  const settingsRef = useRef({ maxTitleLength, maxKeywords, batchSize });
+  const prevProcessingState = usePrevious(processingState);
+  const logContainerRef = useRef(null);
+
+  const getAdobeCategoryNumber = (categoryString) => {
+    if (!categoryString) return '';
+    const adobeCategoryMap = {
+      "animals/wildlife": 1,"buildings/landmarks": 2,"interiors": 2,"business/finance": 3,
+      "food and drink": 7,"the environment": 5,"states of mind": 6,"food": 7,"graphic resources": 8,
+      "backgrounds/textures": 8,"objects": 8,"signs/symbols": 8,"hobbies and leisure": 9,
+      "holidays": 9,"industrial": 10,"industry": 10,"landscapes": 11,"nature": 11,
+      "parks/outdoor": 11,"lifestyle": 12,"beauty/fashion": 12,"people": 13,"celebrities": 13,
+      "plants and flowers": 14,"culture and religion": 15,"religion": 15,"the arts": 15,
+      "vintage": 15,"science": 16,"healthcare/medical": 16,"social issues": 17,"sports": 18,
+      "sports/recreation": 18,"technology": 19,"transport": 20,"transportation": 20,"travel": 21,"abstract": 22,
+    };
+    const categories = categoryString.split(',').map(c => c.trim().toLowerCase());
+    for (const category of categories) {
+      if (adobeCategoryMap[category]) return adobeCategoryMap[category].toString();
+    }
+    return '';
+  };
+
+  const addLog = useCallback((message, type = 'info') => {
+    const newLog = {
+      id: crypto.randomUUID(),
+      timestamp: new Date(),
+      message,
+      type, // 'info', 'success', 'error'
+    };
+    setLogs(prevLogs => [newLog, ...prevLogs]);
+  }, []);
+
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = 0;
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('geminiApiKey');
+    if (savedApiKey) setApiKey(savedApiKey);
+    const savedTitleLength = localStorage.getItem('maxTitleLength');
+    if (savedTitleLength) setMaxTitleLength(parseInt(savedTitleLength, 10));
+    const savedMaxKeywords = localStorage.getItem('maxKeywords');
+    if (savedMaxKeywords) setMaxKeywords(parseInt(savedMaxKeywords, 10));
+    const savedBatchSize = localStorage.getItem('batchSize');
+    if (savedBatchSize) setBatchSize(parseInt(savedBatchSize, 10));
+  }, []);
+
+  useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem('geminiApiKey', apiKey);
+      apiKeysRef.current = apiKey.split('\n').map(k => k.trim()).filter(Boolean);
+    } else {
+      localStorage.removeItem('geminiApiKey');
+      apiKeysRef.current = [];
+    }
+  }, [apiKey]);
+
+  useEffect(() => {
+    localStorage.setItem('maxTitleLength', String(maxTitleLength));
+    settingsRef.current.maxTitleLength = maxTitleLength;
+  }, [maxTitleLength]);
+
+  useEffect(() => {
+    localStorage.setItem('maxKeywords', String(maxKeywords));
+    settingsRef.current.maxKeywords = maxKeywords;
+  }, [maxKeywords]);
+
+  useEffect(() => {
+    localStorage.setItem('batchSize', String(batchSize));
+    settingsRef.current.batchSize = batchSize;
+  }, [batchSize]);
+
+  const handleFilesAdded = useCallback((newFiles) => {
+    const newMediaFiles = newFiles.map(file => ({
+        id: crypto.randomUUID(), file, filename: file.name, description: '', keywords: '',
+        categories: '', isMature: false, isEditorial: false, status: 'idle', errorMessage: null,
+        apiKeyIndex: null,
+      }));
+    setMediaFiles(prevFiles => [...prevFiles, ...newMediaFiles]);
+    setReport(null); // Clear previous report on new file addition
+  }, []);
+
+  const updateMediaFile = useCallback((id, updates) => {
+    setMediaFiles(prevFiles =>
+      prevFiles.map(mf => (mf.id === id ? { ...mf, ...updates } : mf))
+    );
+  }, []);
+  
+  const removeAllMediaFiles = useCallback(() => {
+    setMediaFiles([]);
+    setReport(null);
+  }, []);
+  
+  const generateReport = useCallback(() => {
+    if (totalToProcess > 0) {
+      const successful = mediaFiles.filter(mf => mf.status === 'success');
+      const failed = mediaFiles.filter(mf => mf.status === 'error');
+      addLog(`Batch processing finished. ${successful.length} successful, ${failed.length} failed.`);
+      setReport({ successful, failed });
+    }
+  }, [mediaFiles, totalToProcess, addLog]);
+  
+  useEffect(() => {
+    if (processingState !== 'running') return;
+
+    let isStillRunning = true;
+
+    const process = async () => {
+      const files = filesToProcessRef.current;
+      const keys = apiKeysRef.current;
+      const currentBatchSize = settingsRef.current.batchSize;
+      
+      while (currentIndexRef.current < files.length && isStillRunning) {
+        const chunk = files.slice(currentIndexRef.current, currentIndexRef.current + currentBatchSize);
+        
+        const promises = chunk.map(fileToProcess => {
+          // Immediately get the key for this file to avoid race conditions in the async block
+          const keyIndex = batchApiKeyIndexRef.current % keys.length;
+          const keyToUse = keys[keyIndex];
+          batchApiKeyIndexRef.current++;
+
+          return (async () => {
+            updateMediaFile(fileToProcess.id, { status: 'processing', errorMessage: null, apiKeyIndex: keyIndex });
+            addLog(`Processing '${fileToProcess.filename}'...`);
+            const MAX_RETRIES = 3;
+            let lastError;
+
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+              if (!isStillRunning) return;
+              try {
+                const settings = settingsRef.current;
+                const metadata = await generateMetadataForFile(fileToProcess.file, keyToUse, { maxTitleLength: settings.maxTitleLength, maxKeywords: settings.maxKeywords });
+                if (!isStillRunning) return;
+                updateMediaFile(fileToProcess.id, {
+                  description: metadata.description, keywords: metadata.keywords, categories: metadata.categories,
+                  status: 'success',
+                });
+                addLog(`Successfully processed '${fileToProcess.filename}' with key no ${keyIndex + 1}.`, 'success');
+                return;
+              } catch (error) {
+                lastError = error instanceof Error ? error : new Error('Failed to generate metadata');
+                console.warn(`Attempt ${attempt} for file ${fileToProcess.filename} failed:`, lastError.message);
+                if (attempt < MAX_RETRIES) {
+                  await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
+                }
+              }
+            }
+            
+            if (lastError && isStillRunning) {
+              const errorMessage = `Failed after ${MAX_RETRIES} attempts: ${lastError.message}`;
+              updateMediaFile(fileToProcess.id, { status: 'error', errorMessage: errorMessage });
+              addLog(`Error processing '${fileToProcess.filename}' with key no ${keyIndex + 1}: ${errorMessage}`, 'error');
+            }
+          })();
+        });
+        
+        await Promise.allSettled(promises);
+        
+        if (isStillRunning) {
+          currentIndexRef.current += chunk.length;
+          setProcessedCount(currentIndexRef.current);
+        }
+      }
+      
+      if (isStillRunning && currentIndexRef.current >= files.length) {
+        setProcessingState('idle');
+      }
+    };
+    
+    process();
+    
+    return () => { isStillRunning = false; };
+  }, [processingState, updateMediaFile, addLog]);
+
+  useEffect(() => {
+    if ((prevProcessingState === 'running' || prevProcessingState === 'paused') && processingState === 'idle') {
+      generateReport();
+    }
+  }, [processingState, prevProcessingState, generateReport]);
+
+  const startProcessing = useCallback((filesToProcess) => {
+    if (apiKeysRef.current.length === 0) {
+      alert("Please enter your Gemini API Key in the provided field.");
+      return;
+    }
+    if (filesToProcess.length === 0) {
+      alert("There are no files to process.");
+      return;
+    }
+    setLogs([]);
+    addLog(`Starting batch processing for ${filesToProcess.length} files.`);
+    filesToProcessRef.current = filesToProcess;
+    setTotalToProcess(filesToProcess.length);
+    currentIndexRef.current = 0;
+    setProcessedCount(0);
+    batchApiKeyIndexRef.current = 0;
+    setReport(null);
+    setProcessingState('running');
+  }, [addLog]);
+
+  const handleStart = useCallback(() => {
+    const filesToProcess = mediaFiles.filter(mf => mf.status !== 'success');
+    if (filesToProcess.length === 0) {
+      alert("No files to process or all files already have metadata.");
+      return;
+    }
+    startProcessing(filesToProcess);
+  }, [mediaFiles, startProcessing]);
+  
+  const handleRetryFailed = useCallback(() => {
+    if (report && report.failed.length > 0) {
+        startProcessing(report.failed);
+    }
+  }, [report, startProcessing]);
+
+  const handlePause = () => {
+    addLog("Processing paused by user.");
+    setProcessingState('paused');
+  }
+  const handleResume = () => {
+    addLog("Processing resumed.");
+    setProcessingState('running');
+  }
+  const handleStop = () => {
+    addLog("Processing stopped by user.");
+    setProcessingState('idle');
+    currentIndexRef.current = 0;
+    filesToProcessRef.current = [];
+    setProcessedCount(0);
+    setTotalToProcess(0);
+  };
+  
+  const handleStartNew = () => {
+    setMediaFiles([]);
+    setReport(null);
+    setProcessingState('idle');
+    setProcessedCount(0);
+    setTotalToProcess(0);
+    setLogs([]);
+  };
+
+  const escapeCsvField = (field) => {
+    if (field === undefined || field === null) return '';
+    const str = String(field);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const handleExportShutterstockCsv = useCallback(() => {
+    const filesToExport = report ? report.successful : mediaFiles.filter(mf => mf.status === 'success');
+    if (filesToExport.length === 0) {
+      alert("No successfully processed files to export.");
+      return;
+    }
+    const header = ['Filename', 'Description', 'Keywords', 'Categories', 'Editorial', 'Mature content'];
+    const rows = filesToExport.map(mf => [
+      escapeCsvField(mf.filename), escapeCsvField(mf.description), escapeCsvField(mf.keywords),
+      escapeCsvField(mf.categories), escapeCsvField(mf.isEditorial ? 'Yes' : 'No'), escapeCsvField(mf.isMature ? 'Yes' : 'No'),
+    ].join(','));
+    const csvContent = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'metadata_shutterstock.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [mediaFiles, report]);
+  
+  const handleExportAdobeCsv = useCallback(() => {
+    const filesToExport = report ? report.successful : mediaFiles.filter(mf => mf.status === 'success');
+    if (filesToExport.length === 0) {
+      alert("No successfully processed files to export.");
+      return;
+    }
+    const header = ['Filename', 'Title', 'Keywords', 'Category'];
+    const rows = filesToExport.map(mf => [
+      escapeCsvField(mf.filename), escapeCsvField(mf.description),
+      escapeCsvField(mf.keywords), escapeCsvField(getAdobeCategoryNumber(mf.categories)),
+    ].join(','));
+    const csvContent = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'metadata_adobestock.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [mediaFiles, report]);
+
+  const inputStyles = "block w-full py-2 px-3 sm:text-sm transition-colors input-hud";
+  
+  const renderContent = () => {
+    if (report) {
+      return (
+        <section className={`p-6 panel-hud`}>
+          <div className="panel-hud-footer"></div>
+          <h2 className="text-3xl font-bold text-text-primary uppercase tracking-wider mb-6 text-center">Processing Report</h2>
+          <div className="text-center space-y-4 mb-8">
+             <div className="flex justify-center items-center gap-8">
+                <div className="flex items-center gap-3 text-2xl">
+                    <CheckCircleIcon className="w-8 h-8" style={{color: 'var(--color-success)'}} />
+                    <span className="font-bold">{report.successful.length}</span>
+                    <span className="text-text-secondary">Successful</span>
+                </div>
+                <div className="flex items-center gap-3 text-2xl">
+                    <XCircleIcon className="w-8 h-8" style={{color: 'var(--color-fail)'}} />
+                    <span className="font-bold">{report.failed.length}</span>
+                    <span className="text-text-secondary">Failed</span>
+                </div>
+             </div>
+          </div>
+          
+          {report.failed.length > 0 && (
+            <div className="mb-8">
+                <h3 className="text-xl font-bold text-panel-border glow-text-cyan mb-3 uppercase tracking-widest">Failed Files</h3>
+                <div className="max-h-60 overflow-y-auto bg-background/50 p-3 rounded-sm space-y-2 border border-panel-light">
+                    {report.failed.map(file => (
+                        <div key={file.id} className="p-2 bg-panel-light/50 rounded-sm">
+                            <div className="flex justify-between items-center">
+                                <p className="font-semibold truncate text-text-primary">{file.filename}</p>
+                                {file.apiKeyIndex !== null && (
+                                    <span className="text-xs text-text-secondary ml-2 whitespace-nowrap">
+                                        Key #{file.apiKeyIndex + 1}
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-xs text-red-400 mt-1">{file.errorMessage}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+          )}
+
+          <div className="my-8">
+            <AdsenseAd client="ca-pub-6981152180026116" slot="1849825525" />
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 border-t border-panel-light pt-6 flex-wrap">
+                <Button onClick={handleExportAdobeCsv} variant="outline" disabled={report.successful.length === 0}>
+                    <DownloadIcon className="w-4 h-4 mr-2" /> Adobe CSV
+                </Button>
+                <Button onClick={handleExportShutterstockCsv} variant="outline" disabled={report.successful.length === 0}>
+                    <DownloadIcon className="w-4 h-4 mr-2" /> Shutterstock CSV
+                </Button>
+                <Button onClick={handleRetryFailed} variant="secondary" disabled={report.failed.length === 0}>
+                    <RefreshCwIcon className="w-4 h-4 mr-2" /> Retry {report.failed.length} Failed
+                </Button>
+                <Button onClick={handleStartNew} variant="primary">
+                    <RefreshCwIcon className="w-4 h-4 mr-2" /> Start New Batch
+                </Button>
+          </div>
+        </section>
+      );
+    }
+    
+    if (processingState === 'running' || processingState === 'paused') {
+        const progress = totalToProcess > 0 ? (processedCount / totalToProcess) * 100 : 0;
+        const logTypeStyles = {
+            info: 'text-text-secondary',
+            success: 'text-green-400',
+            error: 'text-red-400',
+        };
+        return (
+            <section className={`p-6 panel-hud`}>
+                 <div className="panel-hud-footer"></div>
+                 <h2 className="text-3xl font-bold text-text-primary uppercase tracking-wider mb-6 text-center">Processing Batch</h2>
+                 <div className="space-y-4">
+                     <p className="text-center text-text-secondary text-lg">
+                        {processingState === 'paused' ? 'Paused' : 'Processing...'} 
+                        <span className="font-bold text-text-primary"> {processedCount} / {totalToProcess} </span> 
+                        files
+                    </p>
+                    <div className="w-full h-4 progress-bar">
+                        <div className="h-full progress-bar-inner" style={{ width: `${progress}%` }}></div>
+                    </div>
+                 </div>
+                 
+                 <div className="mt-8">
+                     <h3 className="text-lg font-bold text-panel-border glow-text-cyan mb-3 uppercase tracking-widest">Activity Log</h3>
+                     <div ref={logContainerRef} className="h-64 overflow-y-auto bg-background/50 p-3 rounded-sm space-y-2 border border-panel-light font-mono text-xs">
+                         {logs.map(log => (
+                             <div key={log.id} className={`flex gap-3 ${logTypeStyles[log.type]}`}>
+                                 <span className="opacity-60">{log.timestamp.toLocaleTimeString()}</span>
+                                 <p className="flex-1">{log.message}</p>
+                             </div>
+                         ))}
+                     </div>
+                 </div>
+
+                 <div className="flex justify-center items-center gap-4 mt-8 border-t border-panel-light pt-6">
+                    {processingState === 'running' && (
+                        <>
+                            <Button onClick={handlePause} variant="secondary"><PauseIcon className="w-5 h-5 mr-2" /> Pause</Button>
+                            <Button onClick={handleStop} variant="danger"><StopIcon className="w-5 h-5 mr-2" /> Stop</Button>
+                        </>
+                    )}
+                    {processingState === 'paused' && (
+                        <>
+                            <Button onClick={handleResume} variant="primary"><PlayIcon className="w-5 h-5 mr-2" /> Resume</Button>
+                            <Button onClick={handleStop} variant="danger"><StopIcon className="w-5 h-5 mr-2" /> Stop</Button>
+                        </>
+                    )}
+                 </div>
+            </section>
+        );
+    }
+    
+    return (
+        <>
+            <FileUploader onFilesAdded={handleFilesAdded} />
+            {mediaFiles.length > 0 && (
+              <section className="my-8">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 panel-hud">
+                  <div className="panel-hud-footer"></div>
+                  <h2 className="text-3xl font-bold text-text-primary uppercase tracking-wider">
+                    {mediaFiles.length} {mediaFiles.length === 1 ? 'File' : 'Files'} Ready
+                  </h2>
+                  <div className="flex gap-2 flex-wrap justify-center">
+                    <Button onClick={handleStart} disabled={!apiKey} variant="primary" title={!apiKey ? "Please enter your Gemini API Key" : "Generate metadata for all"}>
+                        <SparklesIcon className="w-5 h-5 mr-2" /> Generate All
+                    </Button>
+                    <Button onClick={removeAllMediaFiles} variant="danger" size="md">
+                        <TrashIcon className="w-4 h-4 mr-1" /> Clear All
+                    </Button>
+                  </div>
+                </div>
+              </section>
+            )}
+        </>
+    );
+  };
+  
+
+  return (
+    <div className="min-h-screen p-4 md:p-8">
+      <header className="mb-10 text-center">
+        <div className="inline-flex flex-col items-center gap-4">
+            <ArcReactorIcon className="w-24 h-24" isProcessing={processingState !== 'idle'}/>
+            <h1 className="text-5xl font-bold tracking-wider text-text-primary uppercase">
+                <span className="text-accent-primary glow-text-primary">KDG</span> Metadata Media
+            </h1>
+        </div>
+        <p className="text-text-secondary mt-2 text-lg font-semibold tracking-wide">AI-POWERED METADATA AUTOMATION</p>
+      </header>
+      <main className="max-w-7xl mx-auto space-y-8">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className={`lg:col-span-2 p-6 panel-hud`}>
+                <div className="panel-hud-footer"></div>
+                <label htmlFor="apiKey" className="block text-lg font-bold text-panel-border glow-text-cyan uppercase tracking-widest mb-3">
+                    Gemini API Key
+                </label>
+                <div className="relative">
+                    <textarea
+                        id="apiKey"
+                        rows={8}
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        placeholder="Enter one or more API keys, one per line..."
+                        className={`${inputStyles} font-mono text-sm ${isApiKeyVisible ? '' : 'invisible'}`}
+                        aria-label="Gemini API Keys"
+                        style={{ resize: 'none' }}
+                        spellCheck="false"
+                    />
+                    <textarea
+                        rows={8}
+                        readOnly
+                        value={apiKey.replace(/[^\n]/g, '•')}
+                        className={`${inputStyles} font-mono text-sm absolute top-0 left-0 w-full h-full ${!isApiKeyVisible ? '' : 'invisible'}`}
+                        aria-label="Masked Gemini API Keys"
+                        style={{ resize: 'none' }}
+                        onClick={() => setIsApiKeyVisible(true)}
+                    />
+                    <button
+                        onClick={() => setIsApiKeyVisible(!isApiKeyVisible)}
+                        className="absolute top-2 right-2 p-1.5 text-text-secondary hover:text-accent-primary transition-colors rounded-md z-10"
+                        aria-label={isApiKeyVisible ? 'Hide API Key' : 'Show API Key'}
+                    >
+                      {isApiKeyVisible ? <EyeOffIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}
+                    </button>
+                </div>
+                <p className="text-xs text-text-secondary mt-2">
+                    Your key is stored securely in your browser. Get one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-accent-primary hover:underline">Google AI Studio</a>.
+                </p>
+            </div>
+            <div className="lg:col-span-1 h-full">
+                <AdsenseAd client="ca-pub-6981152180026116" slot="1849825525" />
+            </div>
+        </section>
+        <section className={`p-6 panel-hud`}>
+            <div className="panel-hud-footer"></div>
+            <h3 className="text-xl font-bold text-panel-border glow-text-cyan mb-4 border-b border-panel-light pb-3 uppercase tracking-widest">AI Configuration</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label htmlFor="maxTitleLength" className="block text-sm font-bold text-text-secondary mb-2">MAX TITLE LENGTH</label>
+                    <input type="number" id="maxTitleLength" value={maxTitleLength}
+                        onChange={(e) => setMaxTitleLength(Math.max(10, parseInt(e.target.value, 10) || 10))}
+                        className={inputStyles} min="10" max="200" />
+                     <p className="text-xs text-text-secondary mt-1">Max characters for description.</p>
+                </div>
+                <div>
+                    <label htmlFor="maxKeywords" className="block text-sm font-bold text-text-secondary mb-2">MAX KEYWORDS</label>
+                    <input type="number" id="maxKeywords" value={maxKeywords}
+                        onChange={(e) => setMaxKeywords(Math.max(5, parseInt(e.target.value, 10) || 5))}
+                        className={inputStyles} min="5" max="49" />
+                     <p className="text-xs text-text-secondary mt-1">Total keywords (5-49).</p>
+                </div>
+                <div>
+                    <label htmlFor="batchSize" className="block text-sm font-bold text-text-secondary mb-2">PROCESS BATCH SIZE</label>
+                    <input type="number" id="batchSize" value={batchSize}
+                        onChange={(e) => setBatchSize(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className={inputStyles} min="1" max="10" />
+                     <p className="text-xs text-text-secondary mt-1">Files processed concurrently (1-10).</p>
+                </div>
+            </div>
+        </section>
+        
+        {renderContent()}
+
+      </main>
+    </div>
+  );
+};
+
+// --- from index.tsx ---
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

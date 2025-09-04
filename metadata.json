@@ -1,0 +1,6 @@
+{
+  "name": "KDG Metadata Media",
+  "description": "Aplikasi web ringan untuk membuat metadata secara massal untuk berkas media (gambar dan video) menggunakan AI. Menampilkan progres bar global dan laporan ringkasan, serta mengekspor ke format CSV standar Adobestock dan Shutterstock. (Lightweight web application to batch-create metadata for media files (images and videos) using AI. Features a global progress bar and summary report, and exports to Adobestock and Shutterstock standard CSV format.)",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
