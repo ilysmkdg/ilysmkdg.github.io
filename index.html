@@ -944,6 +944,63 @@ const App = () => {
       document.body.removeChild(link);
     }
   }, [mediaFiles, report]);
+  
+  const handleExportVecteezyCsv = useCallback(() => {
+    const filesToExport = report ? report.successful : mediaFiles.filter(mf => mf.status === 'success');
+    if (filesToExport.length === 0) {
+      alert("No successfully processed files to export.");
+      return;
+    }
+    const header = ['Filename', 'Title', 'Keywords', 'Description', 'is_editorial', 'has_releases', 'is_ai_generated'];
+    const rows = filesToExport.map(mf => [
+      escapeCsvField(mf.filename),
+      escapeCsvField(mf.description),
+      escapeCsvField(mf.keywords),
+      escapeCsvField(mf.description), // Vecteezy's description can be same as title
+      escapeCsvField(mf.isEditorial ? 'y' : 'n'),
+      escapeCsvField('n'), // No release management in this app
+      escapeCsvField('n')  // Not AI generated content, just metadata
+    ].join(','));
+    const csvContent = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'metadata_vecteezy.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [mediaFiles, report]);
+
+  const handleExportFreepikCsv = useCallback(() => {
+    const filesToExport = report ? report.successful : mediaFiles.filter(mf => mf.status === 'success');
+    if (filesToExport.length === 0) {
+      alert("No successfully processed files to export.");
+      return;
+    }
+    const header = ['Title', 'Keywords', 'AI Generated', 'Releases'];
+    const rows = filesToExport.map(mf => [
+      escapeCsvField(mf.description),
+      escapeCsvField(mf.keywords),
+      escapeCsvField('No'), // Not AI generated content, just metadata
+      escapeCsvField('')    // No release management in this app
+    ].join(','));
+    const csvContent = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'metadata_freepik.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [mediaFiles, report]);
 
   const inputStyles = "block w-full py-2 px-3 sm:text-sm transition-colors input-hud";
   
@@ -999,6 +1056,12 @@ const App = () => {
                 </Button>
                 <Button onClick={handleExportShutterstockCsv} variant="outline" disabled={report.successful.length === 0}>
                     <DownloadIcon className="w-4 h-4 mr-2" /> Shutterstock CSV
+                </Button>
+                 <Button onClick={handleExportVecteezyCsv} variant="outline" disabled={report.successful.length === 0}>
+                    <DownloadIcon className="w-4 h-4 mr-2" /> Vecteezy CSV
+                </Button>
+                <Button onClick={handleExportFreepikCsv} variant="outline" disabled={report.successful.length === 0}>
+                    <DownloadIcon className="w-4 h-4 mr-2" /> Freepik CSV
                 </Button>
                 <Button onClick={handleRetryFailed} variant="secondary" disabled={report.failed.length === 0}>
                     <RefreshCwIcon className="w-4 h-4 mr-2" /> Retry {report.failed.length} Failed
