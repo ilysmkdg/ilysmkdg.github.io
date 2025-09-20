@@ -152,6 +152,46 @@
           transition: width 0.3s ease-out;
           box-shadow: 0 0 15px var(--color-panel-border);
       }
+      
+      .range-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 8px;
+        background: var(--color-background);
+        border: 1px solid var(--color-panel-light);
+        border-radius: 5px;
+        outline: none;
+        transition: opacity .2s;
+        cursor: pointer;
+      }
+      .range-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--color-accent-primary);
+        border: 2px solid var(--color-background);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        margin-top: -7px; /* Align thumb with track */
+      }
+      .range-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: var(--color-accent-primary);
+        border: 2px solid var(--color-background);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      }
+      .range-slider:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 0 3px var(--color-background), 0 0 0 4px var(--color-accent-primary);
+      }
+      .range-slider:focus::-moz-range-thumb {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 0 3px var(--color-background), 0 0 0 4px var(--color-accent-primary);
+      }
     </style>
   <!-- Add Babel for JSX Transpilation -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -645,6 +685,7 @@ const App = () => {
   const settingsRef = useRef({ maxTitleLength, maxKeywords, batchSize });
   const prevProcessingState = usePrevious(processingState);
   const logContainerRef = useRef(null);
+  const isAutoPausedRef = useRef(false);
 
   const getAdobeCategoryNumber = (categoryString) => {
     if (!categoryString) return '';
@@ -680,6 +721,34 @@ const App = () => {
       logContainerRef.current.scrollTop = 0;
     }
   }, [logs]);
+
+  useEffect(() => {
+    // Watchdog timer for processing stalls. This effect resets on any new log activity.
+    let pauseTimer;
+    if (processingState === 'running') {
+      pauseTimer = setTimeout(() => {
+        addLog("No activity detected for 15 seconds. Auto-pausing.", 'info');
+        isAutoPausedRef.current = true; // Flag the pause as automatic.
+        setProcessingState('paused');
+      }, 15000); // 15 seconds
+    }
+    // Cleanup function to clear the timer if the component re-renders or unmounts.
+    return () => clearTimeout(pauseTimer);
+  }, [processingState, logs, addLog]); // The `logs` dependency is key to reset the timer on activity.
+
+  useEffect(() => {
+    // Auto-resume logic. This effect triggers only when processingState changes.
+    let resumeTimer;
+    if (processingState === 'paused' && isAutoPausedRef.current) {
+      addLog("Auto-resuming in 2 seconds...", 'info');
+      resumeTimer = setTimeout(() => {
+        addLog("Resuming process...", 'info');
+        isAutoPausedRef.current = false; // Reset flag before resuming.
+        setProcessingState('running');
+      }, 2000); // 2 seconds
+    }
+    return () => clearTimeout(resumeTimer);
+  }, [processingState, addLog]);
 
   useEffect(() => {
     const savedApiKey = localStorage.getItem('geminiApiKey');
@@ -862,14 +931,17 @@ const App = () => {
 
   const handlePause = () => {
     addLog("Processing paused by user.");
+    isAutoPausedRef.current = false; // User action, not auto-pause.
     setProcessingState('paused');
   }
   const handleResume = () => {
     addLog("Processing resumed.");
+    isAutoPausedRef.current = false; // User action, clear any auto-pause state.
     setProcessingState('running');
   }
   const handleStop = () => {
     addLog("Processing stopped by user.");
+    isAutoPausedRef.current = false; // User action, clear any auto-pause state.
     setProcessingState('idle');
     currentIndexRef.current = 0;
     filesToProcessRef.current = [];
@@ -1212,25 +1284,34 @@ const App = () => {
             <h3 className="text-xl font-bold text-panel-border glow-text-cyan mb-4 border-b border-panel-light pb-3 uppercase tracking-widest">AI Configuration</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label htmlFor="maxTitleLength" className="block text-sm font-bold text-text-secondary mb-2">MAX TITLE LENGTH</label>
-                    <input type="number" id="maxTitleLength" value={maxTitleLength}
-                        onChange={(e) => setMaxTitleLength(Math.max(10, parseInt(e.target.value, 10) || 10))}
-                        className={inputStyles} min="10" max="200" />
-                     <p className="text-xs text-text-secondary mt-1">Max characters for description.</p>
+                    <div className="flex justify-between items-center mb-1">
+                        <label htmlFor="maxTitleLength" className="block text-sm font-bold text-text-secondary">MAX TITLE LENGTH</label>
+                        <span className="text-sm font-bold text-accent-primary glow-text-primary px-2 py-1 rounded bg-background">{maxTitleLength}</span>
+                    </div>
+                    <input type="range" id="maxTitleLength" value={maxTitleLength}
+                        onChange={(e) => setMaxTitleLength(parseInt(e.target.value, 10))}
+                        className="w-full range-slider" min="10" max="200" aria-label="Maximum title length"/>
+                    <p className="text-xs text-text-secondary mt-1">Max characters for description.</p>
                 </div>
                 <div>
-                    <label htmlFor="maxKeywords" className="block text-sm font-bold text-text-secondary mb-2">MAX KEYWORDS</label>
-                    <input type="number" id="maxKeywords" value={maxKeywords}
-                        onChange={(e) => setMaxKeywords(Math.max(5, parseInt(e.target.value, 10) || 5))}
-                        className={inputStyles} min="5" max="49" />
-                     <p className="text-xs text-text-secondary mt-1">Total keywords (5-49).</p>
+                    <div className="flex justify-between items-center mb-1">
+                        <label htmlFor="maxKeywords" className="block text-sm font-bold text-text-secondary">MAX KEYWORDS</label>
+                         <span className="text-sm font-bold text-accent-primary glow-text-primary px-2 py-1 rounded bg-background">{maxKeywords}</span>
+                    </div>
+                    <input type="range" id="maxKeywords" value={maxKeywords}
+                        onChange={(e) => setMaxKeywords(parseInt(e.target.value, 10))}
+                        className="w-full range-slider" min="5" max="49" aria-label="Maximum number of keywords" />
+                    <p className="text-xs text-text-secondary mt-1">Total keywords (5-49).</p>
                 </div>
                 <div>
-                    <label htmlFor="batchSize" className="block text-sm font-bold text-text-secondary mb-2">PROCESS BATCH SIZE</label>
-                    <input type="number" id="batchSize" value={batchSize}
-                        onChange={(e) => setBatchSize(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                        className={inputStyles} min="1" max="10" />
-                     <p className="text-xs text-text-secondary mt-1">Files processed concurrently (1-10).</p>
+                    <div className="flex justify-between items-center mb-1">
+                        <label htmlFor="batchSize" className="block text-sm font-bold text-text-secondary">PROCESS BATCH SIZE</label>
+                        <span className="text-sm font-bold text-accent-primary glow-text-primary px-2 py-1 rounded bg-background">{batchSize}</span>
+                    </div>
+                    <input type="range" id="batchSize" value={batchSize}
+                        onChange={(e) => setBatchSize(parseInt(e.target.value, 10))}
+                        className="w-full range-slider" min="1" max="10" aria-label="Concurrent processing batch size" />
+                    <p className="text-xs text-text-secondary mt-1">Files processed concurrently (1-10).</p>
                 </div>
             </div>
         </section>
